@@ -1,0 +1,84 @@
+/* Vibrans Gourmet · Historias del banner (1080 x 1920)
+   Mismas variables y tipografías de style.css. Zonas seguras de Instagram:
+   no poner nada importante en los ~250 px de arriba ni en los ~270 px de abajo. */
+:root {
+  --wine: #4A0E1C;
+  --wine-mid: #5E1426;
+  --wine-deep: #2A0710;
+  --gold: #C6A15B;
+  --gold-light: #E3C98F;
+  --gold-deep: #8E6B2B;
+  --cream: #F5EEE3;
+  --ivory: #FBF8F3;
+  --muted: #6E5D5F;
+  --font-display: 'Cormorant Garamond', 'Cormorant', Georgia, serif;
+  --font-body: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; }
+body {
+  position: relative; overflow: hidden;
+  font-family: var(--font-body); font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fondos */
+.dark {
+  color: var(--ivory);
+  background:
+    radial-gradient(900px 900px at 82% 8%, rgba(120, 28, 52, .55), transparent 70%),
+    linear-gradient(180deg, #5E1426 0%, #4A0E1C 42%, #2A0710 100%);
+}
+.light { color: var(--wine); background: var(--cream); }
+
+/* Arcos dorados decorativos (como en las historias anteriores) */
+.ring { position: absolute; border-radius: 50%; border: 2px solid; pointer-events: none; }
+.dark .ring { border-color: rgba(198, 161, 91, .42); }
+.light .ring { border-color: rgba(198, 161, 91, .55); }
+.r1 { width: 1000px; height: 1000px; left: 520px; top: -690px; }
+.r2 { width: 900px; height: 900px; left: 630px; top: -690px; }
+.r3 { width: 760px; height: 760px; left: -470px; top: 1550px; }
+.light .r1 { width: 1000px; height: 1000px; left: -520px; top: -870px; }
+
+/* Texto */
+.eyebrow {
+  position: absolute; left: 0; right: 0; top: 236px; text-align: center;
+  font-weight: 500; font-size: 27px; letter-spacing: .34em; text-transform: uppercase;
+  color: var(--gold); padding-left: .34em;
+}
+.light .eyebrow { color: var(--gold-deep); }
+.title {
+  position: absolute; left: 60px; right: 60px; text-align: center;
+  font-family: var(--font-display); font-weight: 500; line-height: 1.04;
+  font-size: 122px; letter-spacing: -.005em;
+}
+.title em { font-style: italic; font-weight: 500; color: var(--gold); }
+.light .title em { color: var(--gold-deep); }
+.dark .title { color: var(--ivory); }
+
+/* Marcos de foto */
+.arch {
+  position: absolute; overflow: hidden; border: 5px solid var(--gold);
+  border-radius: 999px 999px 0 0; background-color: #eef0f4;
+}
+.round { position: absolute; overflow: hidden; border-radius: 50%; border: 4px solid var(--gold); background-color: #eef0f4; }
+.card  { position: absolute; overflow: hidden; border-radius: 34px; border: 4px solid var(--gold); background-color: #eef0f4; }
+.ph { width: 100%; height: 100%; background-repeat: no-repeat; background-size: cover; }
+
+/* Botones y pies */
+.btn {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  display: inline-flex; align-items: center; justify-content: center; gap: 18px;
+  height: 96px; padding: 0 64px; border-radius: 999px; white-space: nowrap;
+  font-weight: 500; font-size: 33px; letter-spacing: .2em; text-transform: uppercase;
+}
+.dark .btn  { background: var(--gold); color: var(--wine-deep); }
+.light .btn { background: var(--wine); color: var(--gold-light); }
+.foot {
+  position: absolute; left: 0; right: 0; text-align: center;
+  font-weight: 400; font-size: 25px; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--gold); padding-left: .3em;
+}
+.light .foot { color: var(--gold-deep); }
+.brand { color: var(--wine); letter-spacing: .36em; font-weight: 400; }
+.dark .brand { color: var(--gold-light); }
