@@ -31,6 +31,12 @@ const SONETIX_URL       = 'https://sonetix.emanuelvillada10.workers.dev/';
 // además de abrir WhatsApp. Déjalo vacío para usar solo WhatsApp.
 const FORM_ENDPOINT     = '';
 
+// Pedido mínimo (en unidades, sumando todos los productos del pedido).
+const MIN_UNITS         = 20;
+// Cantidad con la que entra un producto al pedido al pulsar "Agregar".
+const DEFAULT_QTY       = 10;
+const MAX_QTY           = 5000;
+
 /* ---------------------------------------------------------------------
    2. DATOS
    Para usar una foto real en cualquier tarjeta añade  img: 'assets/mi-foto.webp'
@@ -60,20 +66,22 @@ const EXPERIENCE = [
 
 // Catálogo (carta). Fotos en assets/, nombradas igual que el producto; textos tomados de "Descripcion de Productos.docx".
 // Las categorías (para el filtro) las asignamos nosotros: el documento no las trae.
+// `price` = valor por unidad en pesos colombianos (COP). Sin `price` el producto se muestra como "Precio por confirmar"
+// y no suma al total de la cotización.
 const PRODUCTS = [
-  { name: 'Antojo de mi tierra',   category: 'Pasabocas',       desc: 'Arepa de queso dorada, coronada con nuestro guacamole de la casa y pancita de cerdo caramelizada. El sabor de casa, en un solo bocado.', img: 'assets/antojo-de-mi-tierra.jpg', pos: 'center 62%', alt: 'Antojo de mi tierra: arepa de queso con guacamole y pancita de cerdo caramelizada' },
-  { name: 'Chicken Cone',          category: 'Pasabocas',       desc: 'Un cono de maíz crocante que guarda un cremoso dip de pollo a las finas hierbas, con maicitos dulces y un toque fresco de cilantro.', img: 'assets/chicken-cone.jpg', pos: 'center 58%', alt: 'Chicken Cone: conos crocantes de maíz rellenos de pollo, crema y maicitos' },
-  { name: 'Tropi canasta',         category: 'Pasabocas',       desc: 'Canasta de plátano dorada y crujiente, rellena de posta cartagenera y piña calada, con una suave salsa de cilantro que lo une todo.', img: 'assets/tropi-canasta.jpg', pos: 'center 60%', alt: 'Tropi canasta: canasta de plátano con posta cartagenera, piña y salsa de cilantro' },
-  { name: 'Volcán exótico',        category: 'Pasabocas',       desc: 'Un buñuelo dorado que esconde un dip sedoso de sour cream, pimentones caramelizados y tocino ahumado. Sorprende desde el primer bocado.', img: 'assets/volcan-exotico.jpg', pos: 'center 52%', alt: 'Volcán exótico: buñuelo relleno con sour cream, pimentones y tocino, decorado con flores comestibles' },
-  { name: 'Sinfonía',              category: 'Canapés',         desc: 'Queso de asar a las finas hierbas, dorado en su punto, con mermelada de uchuva y una uchuva fresca. Dulce, salado y delicadamente ácido.', img: 'assets/sinfonia.jpg', pos: 'center 55%', alt: 'Sinfonía: queso de asar a las finas hierbas con uchuva fresca' },
-  { name: 'Tomatina serrano',      category: 'Canapés',         desc: 'Pan de masa madre con pesto y queso crema, vestido con jamón serrano, tomates cherry y rúcula fresca, y un glaseado de reducción de vino tinto.', img: 'assets/tomatina-serrano.jpg', pos: 'center 62%', alt: 'Tomatina serrano: tostada de masa madre con pesto, jamón serrano, tomate cherry y rúcula' },
-  { name: 'Boca di tuna',          category: 'Canapés',         desc: 'Un cremoso dip de atún con queso crema trufado, servido sobre una tostada de aceite de oliva y finas hierbas. Fresco, suave y con un aroma que invita a repetir.', img: 'assets/boca-di-tuna.jpg', pos: 'center 60%', alt: 'Boca di tuna: dip de atún con queso crema trufado sobre tostada, adornado con pepino' },
-  { name: 'Vibranburguesa',        category: 'Mini sándwiches', desc: 'Mini hamburguesa de 50 g, jugosa, con tocino caramelizado, queso doble crema derretido, vegetales frescos al gusto y nuestras salsas especiales de la casa.', img: 'assets/vibranburguesa.jpg', pos: 'center 62%', alt: 'Vibranburguesa: mini hamburguesa con queso doble crema y lechuga' },
-  { name: 'Italianísimo tropical', category: 'Mini sándwiches', desc: 'Mini sándwich de pepperoni y salami con queso crema trufado y un toque de mermelada de piña que lo hace inolvidable. Vegetales frescos al gusto.', img: 'assets/italianisimo-tropical.jpg', pos: 'center 58%', alt: 'Italianísimo tropical: mini sándwich de pepperoni y salami en croissant' },
-  { name: 'Postre de Oreo', category: 'Caprichos dulces', desc: 'Capas de galleta Oreo y crema suave, coronadas con chantilly y galleta triturada. Un clásico que nunca falla.', img: 'assets/postre-oreo.jpg', pos: 'center 33%', alt: 'Postre en vasito de galleta Oreo con chantilly' },
-  { name: 'Postre de Limón', category: 'Caprichos dulces', desc: 'Una cremosa de limón sobre capas de galleta, con chantilly y ralladura fresca. Cítrico, suave y refrescante.', img: 'assets/postre-limon.jpg', pos: 'center 33%', alt: 'Postre en vasito de crema de limón con galleta y chantilly' },
-  { name: 'Postre de Maracuyá', category: 'Caprichos dulces', desc: 'Crema suave de maracuyá con su pulpa y semillas sobre una base crocante, coronada con chantilly. Tropical, vibrante y ligeramente ácida.', img: 'assets/postre-maracuya.jpg', pos: 'center 38%', alt: 'Postre en vasito de maracuyá con chantilly' },
-  { name: 'Postre de Frutos rojos', category: 'Caprichos dulces', desc: 'Crema suave de frutos rojos con una capa de salsa de fruta y chantilly. Dulce, frutal y delicado.', img: 'assets/postre-frutos-rojos.jpg', pos: 'center 38%', alt: 'Postre en vasito de frutos rojos con chantilly y flor comestible' }
+  { name: 'Antojo de mi tierra',   category: 'Pasabocas', price: 5500,       desc: 'Arepa de queso dorada, coronada con nuestro guacamole de la casa y pancita de cerdo caramelizada. El sabor de casa, en un solo bocado.', img: 'assets/antojo-de-mi-tierra.jpg', pos: 'center 62%', alt: 'Antojo de mi tierra: arepa de queso con guacamole y pancita de cerdo caramelizada' },
+  { name: 'Chicken Cone',          category: 'Pasabocas', price: 5500,       desc: 'Un cono de maíz crocante que guarda un cremoso dip de pollo a las finas hierbas, con maicitos dulces y un toque fresco de cilantro.', img: 'assets/chicken-cone.jpg', pos: 'center 58%', alt: 'Chicken Cone: conos crocantes de maíz rellenos de pollo, crema y maicitos' },
+  { name: 'Tropi canasta',         category: 'Pasabocas', price: 6000,       desc: 'Canasta de plátano dorada y crujiente, rellena de posta cartagenera y piña calada, con una suave salsa de cilantro que lo une todo.', img: 'assets/tropi-canasta.jpg', pos: 'center 60%', alt: 'Tropi canasta: canasta de plátano con posta cartagenera, piña y salsa de cilantro' },
+  { name: 'Volcán exótico',        category: 'Pasabocas', price: 6000,       desc: 'Un buñuelo dorado que esconde un dip sedoso de sour cream, pimentones caramelizados y tocino ahumado. Sorprende desde el primer bocado.', img: 'assets/volcan-exotico.jpg', pos: 'center 52%', alt: 'Volcán exótico: buñuelo relleno con sour cream, pimentones y tocino, decorado con flores comestibles' },
+  { name: 'Sinfonía',              category: 'Canapés', price: 5000,         desc: 'Queso de asar a las finas hierbas, dorado en su punto, con mermelada de uchuva y una uchuva fresca. Dulce, salado y delicadamente ácido.', img: 'assets/sinfonia.jpg', pos: 'center 55%', alt: 'Sinfonía: queso de asar a las finas hierbas con uchuva fresca' },
+  { name: 'Tomatina serrano',      category: 'Canapés', price: 6000,         desc: 'Pan de masa madre con pesto y queso crema, vestido con jamón serrano, tomates cherry y rúcula fresca, y un glaseado de reducción de vino tinto.', img: 'assets/tomatina-serrano.jpg', pos: 'center 62%', alt: 'Tomatina serrano: tostada de masa madre con pesto, jamón serrano, tomate cherry y rúcula' },
+  { name: 'Boca di tuna',          category: 'Canapés', price: 5800,         desc: 'Un cremoso dip de atún con queso crema trufado, servido sobre una tostada de aceite de oliva y finas hierbas. Fresco, suave y con un aroma que invita a repetir.', img: 'assets/boca-di-tuna.jpg', pos: 'center 60%', alt: 'Boca di tuna: dip de atún con queso crema trufado sobre tostada, adornado con pepino' },
+  { name: 'Vibranburguesa',        category: 'Mini sándwiches', price: 6000, desc: 'Mini hamburguesa de 50 g, jugosa, con tocino caramelizado, queso doble crema derretido, vegetales frescos al gusto y nuestras salsas especiales de la casa.', img: 'assets/vibranburguesa.jpg', pos: 'center 62%', alt: 'Vibranburguesa: mini hamburguesa con queso doble crema y lechuga' },
+  { name: 'Italianísimo tropical', category: 'Mini sándwiches', price: 6000, desc: 'Mini sándwich de pepperoni y salami con queso crema trufado y un toque de mermelada de piña que lo hace inolvidable. Vegetales frescos al gusto.', img: 'assets/italianisimo-tropical.jpg', pos: 'center 58%', alt: 'Italianísimo tropical: mini sándwich de pepperoni y salami en croissant' },
+  { name: 'Postre de Oreo', category: 'Caprichos dulces', price: 4500, desc: 'Capas de galleta Oreo y crema suave, coronadas con chantilly y galleta triturada. Un clásico que nunca falla.', img: 'assets/postre-oreo.jpg', pos: 'center 33%', alt: 'Postre en vasito de galleta Oreo con chantilly' },
+  { name: 'Postre de Limón', category: 'Caprichos dulces', price: 4500, desc: 'Una cremosa de limón sobre capas de galleta, con chantilly y ralladura fresca. Cítrico, suave y refrescante.', img: 'assets/postre-limon.jpg', pos: 'center 33%', alt: 'Postre en vasito de crema de limón con galleta y chantilly' },
+  { name: 'Postre de Maracuyá', category: 'Caprichos dulces', price: 4500, desc: 'Crema suave de maracuyá con su pulpa y semillas sobre una base crocante, coronada con chantilly. Tropical, vibrante y ligeramente ácida.', img: 'assets/postre-maracuya.jpg', pos: 'center 38%', alt: 'Postre en vasito de maracuyá con chantilly' },
+  { name: 'Postre de Frutos rojos', category: 'Caprichos dulces', price: 4500, desc: 'Crema suave de frutos rojos con una capa de salsa de fruta y chantilly. Dulce, frutal y delicado.', img: 'assets/postre-frutos-rojos.jpg', pos: 'center 38%', alt: 'Postre en vasito de frutos rojos con chantilly y flor comestible' }
 ];
 
 // Tipos de evento. `single` es el texto que se usa en el mensaje de WhatsApp ("será una boda…").
@@ -168,6 +176,10 @@ function setWaLink(el, text) {
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+/* Dinero en pesos colombianos: $6.000 / $1.250.000 (a mano: es-CO no agrupa los miles de 4 cifras) */
+const money = (n) => '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const productByName = (name) => PRODUCTS.find(p => p.name === name);
 const delay = (i, step = 0.08) => `style="--d:${(i * step).toFixed(2)}s"`;
 
 function renderServices() {
@@ -197,6 +209,9 @@ function renderProducts(filter = 'Todos') {
       <div class="card-media">${visual(p)}<span class="tag">${p.category}</span></div>
       <div class="card-body">
         <h3>${p.name}</h3>
+        ${p.price
+          ? `<div class="price"><strong>${money(p.price)}</strong><span>por unidad</span></div>`
+          : '<div class="price price-tbc"><span>Precio por confirmar</span></div>'}
         <p>${p.desc}</p>
         <button type="button" class="btn btn-wine btn-sm add-btn" data-add="${p.name}" aria-pressed="false">
           <span class="plus" aria-hidden="true"></span>
@@ -292,22 +307,76 @@ function bindPreselect() {
    5. PEDIDO — selección de productos del catálogo
    --------------------------------------------------------------------- */
 
-const selection = new Set();
+const selection = new Map();           // nombre del producto → cantidad (unidades)
 let atForm = false;                    // ¿se está viendo el formulario? (oculta la barra flotante)
+
+const clampQty = (v) => Math.min(MAX_QTY, Math.max(1, Math.floor(Number(v)) || 1));
 
 function saveSelection() {
   try { sessionStorage.setItem('vg-selection', JSON.stringify([...selection])); } catch (_) { /* sin almacenamiento: no pasa nada */ }
 }
 function loadSelection() {
   try {
-    JSON.parse(sessionStorage.getItem('vg-selection') || '[]')
-      .filter(n => PRODUCTS.some(p => p.name === n))
-      .forEach(n => selection.add(n));
+    JSON.parse(sessionStorage.getItem('vg-selection') || '[]').forEach(item => {
+      const [name, qty] = Array.isArray(item) ? item : [item, DEFAULT_QTY];   // acepta el formato anterior (solo nombres)
+      if (productByName(name)) selection.set(name, clampQty(qty));
+    });
   } catch (_) { /* ignorar */ }
+}
+
+/* Cifras del pedido: unidades, total en pesos y qué productos aún no tienen precio */
+function orderTotals() {
+  let units = 0, total = 0;
+  const lines = [], unpriced = [];
+  selection.forEach((qty, name) => {
+    const p = productByName(name);
+    const sub = p && p.price ? p.price * qty : 0;
+    units += qty;
+    total += sub;
+    if (!(p && p.price)) unpriced.push(name);
+    lines.push({ name, qty, price: p ? p.price : 0, sub, category: p ? p.category : '' });
+  });
+  return { units, total, lines, unpriced, missing: Math.max(0, MIN_UNITS - units), ok: units >= MIN_UNITS };
+}
+
+function renderQuoteSheet(t) {
+  $('#selList').innerHTML = t.lines.map(l => `
+    <li>
+      <div class="qs-prod">
+        <strong>${l.name}</strong>
+        <span>${l.price ? `${money(l.price)} c/u` : 'Precio por confirmar'} · ${l.category}</span>
+      </div>
+      <div class="stepper qs-step" role="group" aria-label="Cantidad de ${l.name}">
+        <button type="button" data-qty="${l.name}" data-d="-1" aria-label="Menos ${l.name}">−</button>
+        <input type="number" min="1" max="${MAX_QTY}" inputmode="numeric" value="${l.qty}" data-qty-input="${l.name}" aria-label="Unidades de ${l.name}">
+        <button type="button" data-qty="${l.name}" data-d="1" aria-label="Más ${l.name}">+</button>
+      </div>
+      <div class="qs-sub">${l.price ? money(l.sub) : '<em>Por confirmar</em>'}</div>
+      <button type="button" class="sel-remove" data-remove="${l.name}" aria-label="Quitar ${l.name}">×</button>
+    </li>`).join('');
+
+  const totals = $('#selTotals');
+  totals.hidden = t.lines.length === 0;
+  if (!t.lines.length) return;
+
+  const pct = Math.min(100, Math.round(t.units / MIN_UNITS * 100));
+  const bar = $('#qsBar');
+  bar.style.width = pct + '%';
+  bar.parentElement.setAttribute('aria-valuenow', Math.min(t.units, MIN_UNITS));
+  totals.classList.toggle('is-ok', t.ok);
+  $('#qsMeterText').textContent = t.ok
+    ? `Cumples el pedido mínimo de ${MIN_UNITS} unidades.`
+    : `Pedido mínimo: ${MIN_UNITS} unidades. Llevas ${t.units}, te ${t.missing === 1 ? 'falta 1' : `faltan ${t.missing}`}.`;
+  $('#qsUnits').textContent = t.units;
+  $('#qsTotal').textContent = money(t.total);
+  $('#qsNote').textContent = t.unpriced.length
+    ? `El total no incluye ${t.unpriced.join(' ni ')}: su precio se confirma en la cotización. `
+    : '';
 }
 
 function updateSelectionUI() {
   const n = selection.size;
+  const t = orderTotals();
 
   $$('.add-btn').forEach(b => {
     const on = selection.has(b.dataset.add);
@@ -320,19 +389,25 @@ function updateSelectionUI() {
   count.textContent = n;
   count.hidden = n === 0;
 
-  $('#selBarText').textContent = n === 1 ? '1 producto en tu pedido' : `${n} productos en tu pedido`;
+  $('#selBarText').innerHTML = t.ok
+    ? `<strong>${t.units} unidades</strong><span class="sb-sep"> · </span><span class="sb-total">${money(t.total)}</span>`
+    : `<strong>${t.units} de ${MIN_UNITS}</strong> unidades mínimas`;
+  $('#selBar').classList.toggle('is-ready', t.ok);
   $('#selBar').classList.toggle('is-visible', n > 0 && !atForm);
 
-  $('#selList').innerHTML = [...selection].map(name => {
-    const p = PRODUCTS.find(x => x.name === name);
-    return `<li><div><strong>${name}</strong><span>${p ? p.category : ''}</span></div>
-            <button type="button" class="sel-remove" data-remove="${name}" aria-label="Quitar ${name}">×</button></li>`;
-  }).join('');
+  renderQuoteSheet(t);
   $('#selEmpty').hidden = n > 0;
 }
 
 function toggleProduct(name) {
-  selection.has(name) ? selection.delete(name) : selection.add(name);
+  selection.has(name) ? selection.delete(name) : selection.set(name, DEFAULT_QTY);
+  saveSelection();
+  updateSelectionUI();
+}
+
+function setQty(name, qty) {
+  if (!selection.has(name)) return;
+  selection.set(name, clampQty(qty));
   saveSelection();
   updateSelectionUI();
 }
@@ -345,8 +420,22 @@ function setupSelection() {
     if (b) toggleProduct(b.dataset.add);
   });
   $('#selList').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-remove]');
-    if (b) toggleProduct(b.dataset.remove);
+    const rm = e.target.closest('[data-remove]');
+    if (rm) { toggleProduct(rm.dataset.remove); return; }
+    const st = e.target.closest('[data-qty]');
+    if (st) {
+      setQty(st.dataset.qty, selection.get(st.dataset.qty) + Number(st.dataset.d));
+      const again = $(`[data-qty="${CSS.escape(st.dataset.qty)}"][data-d="${st.dataset.d}"]`, $('#selList'));
+      if (again) again.focus();                     // el listado se repinta: devolvemos el foco al botón
+    }
+  });
+  // Cantidad escrita a mano: se confirma al salir del campo o con Enter
+  $('#selList').addEventListener('change', (e) => {
+    const inp = e.target.closest('[data-qty-input]');
+    if (inp) setQty(inp.dataset.qtyInput, inp.value);
+  });
+  $('#selList').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.matches('[data-qty-input]')) { e.preventDefault(); e.target.blur(); }
   });
 
   // La barra flotante se oculta mientras se ve el formulario
@@ -424,11 +513,18 @@ function buildQuoteMessage(v) {
 }
 
 function buildOrderMessage(v) {
+  const t = orderTotals();
   const lines = [
     `Hola, quiero pedir pasabocas de Vibrans Gourmet. Mi nombre es ${v.nombre}.`,
     '',
-    '*Mi selección*',
-    ...[...selection].map(n => `• ${n}`),
+    '*Mi pedido*',
+    ...t.lines.map(l => l.price
+      ? `• ${l.name}: ${l.qty} × ${money(l.price)} = ${money(l.sub)}`
+      : `• ${l.name}: ${l.qty} unidades (precio por confirmar)`),
+    '',
+    `*Total de unidades:* ${t.units}`,
+    `*Total estimado:* ${money(t.total)}` + (t.unpriced.length ? ' (sin los productos por confirmar)' : ''),
+    '_Valores por unidad en pesos colombianos; alquiler, domicilio y montaje se confirman en la cotización._',
     '',
     '*Detalles*'
   ];
@@ -496,6 +592,14 @@ function setupForm() {
       setTimeout(() => $('#selection').classList.remove('is-empty-flash'), 1200);
       return;
     }
+    if (mode === 'pasabocas' && !orderTotals().ok) {
+      const t = orderTotals();
+      showToast(`El pedido mínimo es de ${MIN_UNITS} unidades: te ${t.missing === 1 ? 'falta 1' : `faltan ${t.missing}`}.`);
+      $('#selection').classList.add('is-empty-flash');
+      $('#selection').scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
+      setTimeout(() => $('#selection').classList.remove('is-empty-flash'), 1200);
+      return;
+    }
 
     const values = Object.fromEntries(new FormData(f).entries());
     const message = mode === 'pasabocas' ? buildOrderMessage(values) : buildQuoteMessage(values);
@@ -509,7 +613,12 @@ function setupForm() {
     // Backend opcional
     if (FORM_ENDPOINT) {
       const payload = { ...values, tipo_solicitud: mode, origen: 'web-vibrans', fecha_envio: new Date().toISOString() };
-      if (mode === 'pasabocas') payload.productos = [...selection];
+      if (mode === 'pasabocas') {
+        const t = orderTotals();
+        payload.productos = t.lines.map(({ name, qty, price, sub }) => ({ producto: name, cantidad: qty, valor_unidad: price, subtotal: sub }));
+        payload.total_unidades = t.units;
+        payload.total_estimado = t.total;
+      }
       fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
         .catch(() => { /* el flujo principal es WhatsApp; ignoramos fallos silenciosamente */ });
     }
@@ -766,6 +875,8 @@ const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const tableSize = () => sim.table.shape === 'round' ? { w: sim.table.w, d: sim.table.w } : { w: sim.table.w, d: sim.table.d };
 const tableLabel = () => sim.table.shape === 'round' ? `redonda Ø ${sim.table.w} cm` : `rectangular ${sim.table.w} × ${sim.table.d} cm`;
 const totalPieces = () => Object.values(sim.qty).reduce((a, b) => a + b, 0);
+/* Valor de los pasabocas de la simulación (solo los que ya tienen precio) */
+const piecesValue = () => PRODUCTS.reduce((a, p) => a + (p.price || 0) * (sim.qty[p.name] || 0), 0);
 const totalCap = () => STANDS.reduce((a, s) => a + s.cap * (sim.stands[s.id] || 0), 0);
 const piecesNeeded = () => sim.guests * sim.perGuest;
 
@@ -1053,6 +1164,7 @@ function renderSummary(layout) {
   if (P > C) msgs.push(['warn', `Tienes ${P - C} pasabocas sin lugar en las torres. <button type="button" data-act="suggest">Sugerir torres y bandejas</button>`]);
   else if (P > 0) msgs.push(['ok', 'Todos tus pasabocas caben en las torres y bandejas elegidas.']);
   if (P > 0 && P < need * .9) msgs.push(['info', `Para ${sim.guests} invitados sugerimos unos ${need} pasabocas (llevas ${P}).`]);
+  if (P > 0 && P < MIN_UNITS) msgs.push(['warn', `El pedido mínimo es de ${MIN_UNITS} unidades (llevas ${P}).`]);
   if (layout.left.length) {
     const rec = recommendTables(sim.table.n + 1);
     msgs.push(['warn', `${layout.left.length} ${layout.left.length === 1 ? 'pieza no cabe' : 'piezas no caben'} en tu mesa.` +
@@ -1068,6 +1180,7 @@ function renderSummary(layout) {
       <div><dt>Lugares en torres</dt><dd>${C}</dd></div>
       <div><dt>Sugeridos</dt><dd>${need}</dd></div>
     </dl>
+    <p class="sim-value"><span>Valor estimado de los pasabocas</span><strong>${money(piecesValue())}</strong></p>
     <ul class="sim-msgs">${msgs.map(([k, m]) => `<li class="${k}">${m}</li>`).join('')}</ul>`;
 }
 
@@ -1096,7 +1209,10 @@ function autoCalc() {
 function simToQuote() {
   const lines = ['Configuración de mi simulación:', `• Invitados: ${sim.guests}`];
   const prods = PRODUCTS.filter(p => (sim.qty[p.name] || 0) > 0).map(p => `${p.name} (${sim.qty[p.name]})`);
-  if (prods.length) lines.push(`• Pasabocas: ${prods.join(', ')}`);
+  if (prods.length) {
+    lines.push(`• Pasabocas: ${prods.join(', ')}`);
+    lines.push(`• Valor estimado de los pasabocas: ${money(piecesValue())}`);
+  }
   const stands = STANDS.filter(s => (sim.stands[s.id] || 0) > 0).map(s => `${sim.stands[s.id]} × ${s.name}`);
   if (stands.length) lines.push(`• Alquiler: ${stands.join(', ')}`);
   lines.push(`• Mesa: ${sim.table.n} × ${tableLabel()}`);
@@ -1117,7 +1233,7 @@ function renderSimControls() {
   $('#simProducts').innerHTML = PRODUCTS.map((p, i) => `
     <li>
       <span class="dot" style="background:${SIM_COLORS[i % SIM_COLORS.length]}"></span>
-      <div><strong>${p.name}</strong><small>${p.category}</small></div>
+      <div><strong>${p.name}</strong><small>${p.category}${p.price ? ` · ${money(p.price)} c/u` : ''}</small></div>
       <div class="stepper" role="group" aria-label="${p.name}">
         <button type="button" data-prod="${i}" data-d="-1" aria-label="Menos ${p.name}">−</button>
         <output data-out-prod="${i}">0</output>

@@ -242,8 +242,17 @@
         <div class="section-head center">
           <p class="eyebrow reveal">Nuestros productos</p>
           <h2 class="display reveal" id="productsTitle" style="--d:.08s">Una carta para <em>elegir</em> y combinar</h2>
-          <p class="lead reveal" style="--d:.16s">Elige lo que te antoja y agrégalo a tu pedido. Trabajamos con cotización personalizada: te enviamos una propuesta a la medida.</p>
+          <p class="lead reveal" style="--d:.16s">Elige lo que te antoja, define cuántas unidades quieres de cada uno y arma tu cotización al instante.</p>
         </div>
+
+        <div class="order-rule reveal" role="note">
+          <span class="or-n" aria-hidden="true">20</span>
+          <div>
+            <strong>Pedido mínimo: 20 unidades</strong>
+            <p>Combina los sabores que quieras hasta completarlas. Valores por unidad, en pesos colombianos.</p>
+          </div>
+        </div>
+
         <div class="chips reveal" id="productFilters" role="tablist" aria-label="Filtrar productos por categoría"><!-- script.js --></div>
         <div class="products-grid" id="productsGrid"><!-- se genera desde script.js (PRODUCTS) --></div>
       </div>
@@ -457,9 +466,26 @@
 
             <!-- Solo en modo "Pedir pasabocas": productos elegidos en el catálogo -->
             <div class="field-full selection only-pasabocas" id="selection" aria-live="polite">
-              <p class="selection-title">Tu selección</p>
+              <div class="qs-head">
+                <p class="selection-title">Resumen de tu cotización</p>
+                <span class="qs-min">Pedido mínimo · 20 unidades</span>
+              </div>
+              <div class="qs-cols" aria-hidden="true"><span>Producto</span><span>Cantidad</span><span>Subtotal</span></div>
               <ul class="sel-list" id="selList"></ul>
-              <p class="sel-empty" id="selEmpty">Aún no has elegido productos.</p>
+              <p class="sel-empty" id="selEmpty">Aún no has elegido productos. Agrégalos desde el catálogo y define las cantidades aquí.</p>
+
+              <div class="qs-totals" id="selTotals" hidden>
+                <div class="qs-meter">
+                  <div class="qs-bar" role="progressbar" aria-label="Avance hacia el pedido mínimo" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><i id="qsBar"></i></div>
+                  <p class="qs-meter-text" id="qsMeterText"></p>
+                </div>
+                <dl class="qs-sum">
+                  <div><dt>Unidades</dt><dd id="qsUnits">0</dd></div>
+                  <div class="qs-total"><dt>Total estimado</dt><dd id="qsTotal">$0</dd></div>
+                </dl>
+                <p class="qs-note"><span id="qsNote"></span>Valores por unidad, en pesos colombianos. El alquiler de torres y bandejas, el domicilio y el montaje se confirman en tu cotización.</p>
+              </div>
+
               <a class="link-arrow" href="#productos" id="selMore">Explorar el catálogo <span aria-hidden="true">→</span></a>
             </div>
 
